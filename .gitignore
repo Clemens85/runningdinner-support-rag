@@ -1,0 +1,13 @@
+vector_db/
+__pycache__/
+venv/
+.vscode/
+.env
+.ipynb_checkpoints/
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+calculation_script.py
+support-emails/
+local_chroma_db/

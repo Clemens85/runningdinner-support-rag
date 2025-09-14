@@ -1,0 +1,5 @@
+credentials.json
+gmail_threads/
+gmail_rag/
+__pycache__/
+token.json
