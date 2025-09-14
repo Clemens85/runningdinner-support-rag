@@ -11,3 +11,4 @@ venv/
 calculation_script.py
 support-emails/
 local_chroma_db/
+.idea/
