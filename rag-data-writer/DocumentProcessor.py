@@ -58,15 +58,18 @@ def clean_and_process_email_metadata(text: str) -> str:
     
 def prepare_docs(documents: list[Document]):
     for doc in documents:
-        filename: str = doc.metadata['source']
-        date_str = filename.split('/')[-1]
+        filename: str = get_filename_from_metadata(doc)
         doc.metadata['type'] = 'support-email'
-        doc.metadata['date'] = parse_date(date_str)
+        doc.metadata['date'] = parse_date(filename)
         final_page_content = re.sub(r'<img\b[^>]*?\/>', '', doc.page_content)
         final_page_content = re.sub(r'^(IP:|Content:|ID:).*\n?', '', final_page_content, flags=re.MULTILINE)
         final_page_content, support_type = clean_and_process_email_metadata(final_page_content)
         doc.page_content = final_page_content
         doc.metadata['support_type'] = support_type
+
+def get_filename_from_metadata(doc: Document) -> str:
+    filename: str = doc.metadata['source']
+    return filename.split('/')[-1]
 
 def filter_docs_by_support_type(documents: list[Document], support_type: str) -> list[Document]:
     """
