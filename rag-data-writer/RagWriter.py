@@ -47,7 +47,7 @@ class RagWriter:
         print(f"{len(documents)} Dokumente wurden gespeichert.")
 
     def find_similar_docs(self, query: str, top_k: int = 3) -> list[str]:
-        collection = self.repository.get_collection(auto_create=False)
+        collection = self.repository.get_collection(self.collection_name, auto_create=False)
         query_embedding = self.embed_text(query)
         results = collection.query(
             query_embeddings=[query_embedding],
