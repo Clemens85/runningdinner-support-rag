@@ -1,6 +1,7 @@
 import os
 from typing import List
 from local_db.LocalChromaDbRepository import LocalChromaDbRepository
+from pinecone_db.PineconeDbRepository import PineconeDbRepository
 from RagWriter import RagWriter
 from langchain_core.documents import Document
 
@@ -8,21 +9,30 @@ LOCK_FILE = "import.lock"
 
 class Importer:
 
-    def __init__(self):
-        self.__ensure_lock_file_exists()
+    def __init__(self, reset_lock_file: bool = False, use_local_vector_db: bool = True):
+        self._ensure_lock_file_exists()
+        if reset_lock_file:
+            print("Resetting lock file...")
+            os.remove(LOCK_FILE)
+            self._ensure_lock_file_exists()
 
-    def __ensure_lock_file_exists(self):
+        if use_local_vector_db:
+            self.repository = LocalChromaDbRepository(auto_create=True)
+        else:
+            self.repository = PineconeDbRepository(auto_create=True)
+
+    def _ensure_lock_file_exists(self):
         if not os.path.exists(LOCK_FILE):
             with open(LOCK_FILE, 'w') as f:
                 f.write('')
 
-    def __read_lock_file_lines(self) -> List[str]:
+    def _read_lock_file_lines(self) -> List[str]:
         with open(LOCK_FILE, 'r') as f:
             lines = f.read().splitlines()
         return lines
 
     def import_docs(self, docs: List[Document]):
-        already_imported_docs = self.__read_lock_file_lines()
+        already_imported_docs = self._read_lock_file_lines()
 
         docs_to_import = []
         for doc in docs:
@@ -37,8 +47,7 @@ class Importer:
             docs_to_import.append(doc)
 
         print(f"Importing {len(docs_to_import)} new documents to Vector DB...")
-        repository = LocalChromaDbRepository(database_name="local_chroma_db")
-        writer = RagWriter(repository=repository, collection_name="support_documents_v1")
+        writer = RagWriter(repository=self.repository)
         writer.embed_docs_to_database(docs_to_import)
         print ("Append imported document names to lock file...")
         with open(LOCK_FILE, 'a') as f:

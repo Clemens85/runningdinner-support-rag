@@ -17,5 +17,7 @@ langchain
 langchain-core
 langchain-chroma
 langchain-community
+langchain-pinecone
+pinecone
 plotly
 jupyter

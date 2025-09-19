@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
-from chromadb import Collection
+from langchain.schema import Document
 
 class VectorDbRepository(ABC):
+
     @abstractmethod
-    def get_collection(self, collection_name: str, auto_create: bool = False) -> Collection:
+    def add_document(self, doc_id: str, document: Document, text_embedding: list[float]):
         pass
-    
+
     @abstractmethod
-    def reset_collection(self, collection_name: str) -> Collection:
-      pass
+    def reset(self):
+        pass
+
+    @abstractmethod
+    def find_similar_docs(self, query: str, top_k: int = 3) -> list[str]:
+        pass
