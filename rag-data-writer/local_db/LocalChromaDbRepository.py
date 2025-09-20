@@ -33,3 +33,12 @@ class LocalChromaDbRepository(VectorDbRepository):
             self.client.delete_collection(name=collection_name)
             return self.client.create_collection(name=collection_name)
         return None
+    
+    def find_similar_docs(self, query_embedding: list[float], top_k: int = 3) -> list[str]:
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=['documents', 'metadatas']
+        )
+        similar_texts = results['documents'][0] if results['documents'] else []
+        return similar_texts
