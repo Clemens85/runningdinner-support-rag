@@ -1,25 +1,21 @@
 import os
 from typing import List
-from local_db.LocalChromaDbRepository import LocalChromaDbRepository
-from pinecone_db.PineconeDbRepository import PineconeDbRepository
 from RagWriter import RagWriter
 from langchain_core.documents import Document
+from VectorDbRepository import VectorDbRepository
 
 LOCK_FILE = "import.lock"
 
 class Importer:
 
-    def __init__(self, reset_lock_file: bool = False, use_local_vector_db: bool = True):
+    def __init__(self, repository: VectorDbRepository, reset_lock_file: bool = False):
+        self.repository = repository
         self._ensure_lock_file_exists()
         if reset_lock_file:
             print("Resetting lock file...")
             os.remove(LOCK_FILE)
             self._ensure_lock_file_exists()
 
-        if use_local_vector_db:
-            self.repository = LocalChromaDbRepository(auto_create=True)
-        else:
-            self.repository = PineconeDbRepository(auto_create=True)
 
     def _ensure_lock_file_exists(self):
         if not os.path.exists(LOCK_FILE):

@@ -1,17 +1,17 @@
 import os
 from typing import List
-from dotenv import load_dotenv
 import openai
+import torch
 import tqdm
+from transformers import pipeline
 from VectorDbRepository import VectorDbRepository
 from langchain_core.documents import Document
 from DocumentProcessor import get_filename_from_metadata
+from Util import setup_environment
+from LanguageDetector import LanguageDetector
+from Translator import Translator
 
-load_dotenv(override=True)
-os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY', '')
-
-if (os.environ.get('OPENAI_API_KEY') is None) or (os.environ.get('OPENAI_API_KEY') == ''):
-    raise ValueError("OPENAI_API_KEY is not set in environment variables.")
+setup_environment()
 
 openai = openai.OpenAI()
 EMBEDDING_MODEL = 'text-embedding-3-small'
@@ -19,6 +19,8 @@ EMBEDDING_MODEL = 'text-embedding-3-small'
 class RagWriter:
     def __init__(self, repository: VectorDbRepository):
         self.repository = repository
+        self.language_detector = LanguageDetector()
+        self.translator = Translator()
 
     def embed_text(self, text: str) -> list[float]:
         response = openai.embeddings.create(
@@ -46,17 +48,35 @@ class RagWriter:
 
 
     def embed_docs_to_database(self, documents: List[Document]):
-        for idx, doc in tqdm.tqdm(enumerate(documents), total=len(documents), desc="Embedding and Storing documents to VectorDB"):
+        for _, doc in tqdm.tqdm(enumerate(documents), total=len(documents), desc="Embedding and Storing documents to VectorDB"):
             text = doc.page_content
-            filename = get_filename_from_metadata(doc)
-            embedding = self.embed_text_cached(text, filename)
-            doc_id = str(f"doc-{idx}")
 
-            self.repository.add_document(doc_id, doc, embedding)
-            print(f"Stored document with ID: {doc_id} and metadata: {doc.metadata}")
+            # TODO: Anonymize names and address data here if needed
+
+            languge = self.language_detector.detect_language(text)  # Detect and set language metadata
+            doc.metadata['language'] = languge
+
+            if languge != 'de':
+                translation = self.translator.translate_to_german(doc.page_content)
+                translated_doc = Document(
+                    page_content=translation,
+                    metadata={**doc.metadata, 'language': "de", "filename": get_filename_from_metadata(doc) + "_translated"}
+                )
+                self.put_to_vector_db(translated_doc)
+
+            self.put_to_vector_db(doc)
 
         print(f"{len(documents)} documents were persisted.")
+
+    def put_to_vector_db(self, doc: Document):
+        filename = get_filename_from_metadata(doc)
+        embedding = self.embed_text_cached(doc.page_content, filename)
+        doc_id = filename
+        self.repository.add_document(doc_id, doc, embedding)
+        print(f"Stored translated document with ID: {doc_id} and metadata: {doc.metadata}")
+
 
     def find_similar_docs(self, query: str, top_k: int = 3) -> list[str]:
         query_embedding = self.embed_text(query)
         return self.repository.find_similar_docs(query_embedding, top_k=top_k)
+    

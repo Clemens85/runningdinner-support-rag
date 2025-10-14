@@ -3,7 +3,8 @@ import re
 from langchain.document_loaders import DirectoryLoader, TextLoader
 from langchain_core.documents import Document
 
-SUPPORT_EMAILS_DIR = "../gmail-reader/gmail_threads"
+#SUPPORT_EMAILS_DIR = "../gmail-reader/gmail_threads"
+SUPPORT_EMAILS_DIR = "/home/clemens/Projects/runningdinner-support-rag/gmail-reader/gmail_threads"
 
 def load_support_documents(directory_path: str = SUPPORT_EMAILS_DIR) -> list[Document]:
   text_loader_kwargs = {'encoding': 'utf-8'}
