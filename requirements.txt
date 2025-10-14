@@ -21,3 +21,10 @@ langchain-pinecone
 pinecone
 plotly
 jupyter
+
+# Hugging Face related packages
+transformers
+tokenizers
+torch
+accelerate
+sentencepiece
