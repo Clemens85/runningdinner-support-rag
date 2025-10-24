@@ -2,8 +2,8 @@ import os
 
 from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
-from langchain_core.documents import Document
 from VectorDbRepository import VectorDbRepository
+from SupportDocument import SupportDocument
 
 load_dotenv(override=True)
 os.environ['PINECONE_API_KEY'] = os.getenv('PINECONE_API_KEY', '')
@@ -39,7 +39,7 @@ class PineconeDbRepository(VectorDbRepository):
         # Get the index
         self.index = self.pc.Index(self.index_name)
 
-    def add_document(self, doc_id: str, document: Document, text_embedding: list[float]):
+    def add_document(self, doc_id: str, document: SupportDocument, text_embedding: list[float]):
         """
         Add a document to the Pinecone index with its embedding
         
@@ -64,12 +64,15 @@ class PineconeDbRepository(VectorDbRepository):
         """
         Reset the Pinecone index by deleting it and recreating it
         """
+        print(f"Calling reset on Pinecone index {self.index_name}...")
         if self.pc.has_index(self.index_name):
             # Delete the existing index
+            print(f"Resetting Pinecone index {self.index_name}...")
             self.pc.delete_index(self.index_name)
         
-        # Recreate the index
-        self._init_index()
+        # Recreate the index (ensure auto_create=True)
+        print(f"Recreating Pinecone index {self.index_name}...")
+        self._init_index(auto_create=True)
       
     def find_similar_docs(self, query_embedding: list[float], top_k: int = 3) -> list[str]:
         """

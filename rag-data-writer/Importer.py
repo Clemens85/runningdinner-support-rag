@@ -1,33 +1,36 @@
 import os
 from typing import List
 from RagWriter import RagWriter
-from langchain_core.documents import Document
-from VectorDbRepository import VectorDbRepository
-
-LOCK_FILE = "import.lock"
+from SupportDocument import SupportDocument
+from PipelineConfig import IMPORT_LOCK_FILE
 
 class Importer:
 
-    def __init__(self, repository: VectorDbRepository, reset_lock_file: bool = False):
-        self.repository = repository
+    def __init__(self, rag_writer: RagWriter, reset_lock_file: bool = False, reset_vector_db: bool = False, reset_embedding_cache: bool = False):
+        self.rag_writer = rag_writer
         self._ensure_lock_file_exists()
         if reset_lock_file:
             print("Resetting lock file...")
-            os.remove(LOCK_FILE)
+            os.remove(IMPORT_LOCK_FILE)
             self._ensure_lock_file_exists()
+        if reset_vector_db:
+            print("Resetting Vector DB...")
+            self.rag_writer.get_vector_db_repository().reset()
+        if reset_embedding_cache:
+            self.rag_writer.clear_embedding_cache()
 
 
     def _ensure_lock_file_exists(self):
-        if not os.path.exists(LOCK_FILE):
-            with open(LOCK_FILE, 'w') as f:
+        if not os.path.exists(IMPORT_LOCK_FILE):
+            with open(IMPORT_LOCK_FILE, 'w') as f:
                 f.write('')
 
     def _read_lock_file_lines(self) -> List[str]:
-        with open(LOCK_FILE, 'r') as f:
+        with open(IMPORT_LOCK_FILE, 'r') as f:
             lines = f.read().splitlines()
         return lines
 
-    def import_docs(self, docs: List[Document]):
+    def import_docs(self, docs: List[SupportDocument]):
         already_imported_docs = self._read_lock_file_lines()
 
         docs_to_import = []
@@ -43,11 +46,10 @@ class Importer:
             docs_to_import.append(doc)
 
         print(f"Importing {len(docs_to_import)} new documents to Vector DB...")
-        writer = RagWriter(repository=self.repository)
-        writer.embed_docs_to_database(docs_to_import)
-        print ("Append imported document names to lock file...")
-        with open(LOCK_FILE, 'a') as f:
-            for doc in docs_to_import:
+        final_imported_docs = self.rag_writer.embed_docs_to_database(docs_to_import)
+        print (f"Append final imported document names (final number: {len(final_imported_docs)}) to lock file...")
+        with open(IMPORT_LOCK_FILE, 'a') as f:
+            for doc in final_imported_docs:
                 filename: str = doc.metadata['source']
                 filename = filename.split('/')[-1]
                 f.write(f"{filename}\n")

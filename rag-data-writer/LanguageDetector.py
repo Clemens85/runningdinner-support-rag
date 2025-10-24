@@ -2,6 +2,8 @@ import torch
 from transformers import pipeline
 
 
+LANG_DETECT_HF_MODEL = "papluca/xlm-roberta-base-language-detection"
+
 class LanguageDetector:
     
     def __init__(self):
@@ -17,7 +19,7 @@ class LanguageDetector:
             # It's lightweight (560MB) and supports 20 languages including German and English
             self._language_detector = pipeline(
                 "text-classification",
-                model="papluca/xlm-roberta-base-language-detection",
+                model=LANG_DETECT_HF_MODEL,
                 device=device
             )
         return self._language_detector

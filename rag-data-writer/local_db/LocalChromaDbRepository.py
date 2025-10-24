@@ -1,7 +1,7 @@
 import chromadb
 from VectorDbRepository import VectorDbRepository
 from chromadb.config import Settings
-from langchain_core.documents import Document
+from SupportDocument import SupportDocument
 
 DATABASE_NAME = ".chromadb"
 COLLECTION_NAME = "support-documents-v1"
@@ -11,7 +11,7 @@ class LocalChromaDbRepository(VectorDbRepository):
         self.client = chromadb.PersistentClient(path=f"./{database_name}", settings=settings)
         self.collection = self.__get_collection(collection_name, auto_create=auto_create)
 
-    def add_document(self, doc_id: str, document: Document, text_embedding: list[float]):
+    def add_document(self, doc_id: str, document: SupportDocument, text_embedding: list[float]):
         text = document.page_content
         self.collection.add(
             documents=[text],

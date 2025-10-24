@@ -28,3 +28,5 @@ tokenizers
 torch
 accelerate
 sentencepiece
+peft
+bitsandbytes

@@ -4,6 +4,7 @@ import base64
 import markdownify
 import re
 from email_message import EmailMessage
+from PipelineConfig import RAW_STAGE_DIR
 
 def __generate_filename(date_str: datetime, thread_id: str) -> str:
     # Sat, 07 Jun 2025 07:44:51 +0000 (UTC)
@@ -18,7 +19,7 @@ def __generate_filename(date_str: datetime, thread_id: str) -> str:
         return f"{thread_id}.md"
     return f"{date_str}_{thread_id}.md"
 
-def save_thread_as_markdown(thread_id, messages, out_dir="gmail_threads"):
+def save_thread_as_markdown(thread_id, messages, out_dir=RAW_STAGE_DIR):
     os.makedirs(out_dir, exist_ok=True)
     
     email_messages = __convert_raw_messages_to_messages(messages)

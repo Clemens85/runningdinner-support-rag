@@ -14,3 +14,4 @@ local_chroma_db/
 .idea/
 webapp-data/
 chroma.sqlite3
+pipeline-data/

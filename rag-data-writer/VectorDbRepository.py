@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from langchain.schema import Document
+from SupportDocument import SupportDocument
 
 class VectorDbRepository(ABC):
 
     @abstractmethod
-    def add_document(self, doc_id: str, document: Document, text_embedding: list[float]):
+    def add_document(self, doc_id: str, document: SupportDocument, text_embedding: list[float]):
         pass
 
     @abstractmethod
