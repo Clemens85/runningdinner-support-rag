@@ -1,17 +1,19 @@
 from dotenv import load_dotenv
 from ChatOpenAI import ChatOpenAI
-from FeatureDescriptionGenerator import FeatureDescriptionGenerator, FeatureWriteRequest
+from FeatureDescriptionGenerator import FeatureDescriptionGenerator
+from AdminFeaturesGenerator import AdminFeaturesGenerator
 import os
+from FeatureWriteRequest import FeatureWriteRequest
 
 PROJECT_ROOT = '/home/clemens/Projects/runningdinner/runningdinner-client'
 
-DASHBOARD_ROOT = f"{PROJECT_ROOT}/webapp/src/admin/dashboard"
-TEAMS_ROOT = f"{PROJECT_ROOT}/webapp/src/admin/teams"
-HOST_LOCATIONS_ROOT = f"{PROJECT_ROOT}/webapp/src/admin/hostlocations"
-MESSAGES_ROOT = f"{PROJECT_ROOT}/webapp/src/admin/messages"
-
-ADMIN_I18N_FILE = f"{PROJECT_ROOT}/shared/src/i18n/translations/de/AdminMessages_lang_de.json"
 COMMON_I18N_FILE = f"{PROJECT_ROOT}/shared/src/i18n/translations/de/CommonMessages_lang_de.json"
+
+SELF_I18N_FILE = f"{PROJECT_ROOT}/shared/src/i18n/translations/de/SelfAdminMessages_lang_de.ts"
+SELF_SERVICE_ROOT = f"{PROJECT_ROOT}/webapp/src/self"
+
+LANDING_I18N_FILE = f"{PROJECT_ROOT}/shared/src/i18n/translations/de/LandingMessages_lang_de.ts"
+LANDING_ROOT = f"{PROJECT_ROOT}/webapp/src/landing"
 
 OPENAI_MODEL = "gpt-4o-mini"
 TEMPERATURE = 0.1
@@ -23,44 +25,35 @@ def main():
   model = ChatOpenAI(model=OPENAI_MODEL, temperature=TEMPERATURE)
   generator = FeatureDescriptionGenerator(model=model)
 
-  # feature_name = "Dashboard"
-  # request: FeatureWriteRequest = FeatureWriteRequest(
-  #   feature_root_dir=DASHBOARD_ROOT,
-  #   feature_name=feature_name,
-  #   i18n_files=[ADMIN_I18N_FILE]
-  # )
-  # description = generator.generate_feature_description(request=request)
-  # generator.write_feature_description_to_file(description, get_admin_output_path("Dashboard"))
-
-  # feature_name = "Teams"
-  # request: FeatureWriteRequest = FeatureWriteRequest(
-  #   feature_root_dir=TEAMS_ROOT,
-  #   feature_name=feature_name,
-  #   i18n_files=[ADMIN_I18N_FILE, COMMON_I18N_FILE]
-  # )
-  # description = generator.generate_feature_description(request=request)
-  # generator.write_feature_description_to_file(description, get_admin_output_path("Teams"))
-
-
-  # feature_name = "Dinner Routen Übersicht"
-  # request: FeatureWriteRequest = FeatureWriteRequest(
-  #   feature_root_dir=HOST_LOCATIONS_ROOT,
-  #   feature_name=feature_name,
-  #   i18n_files=[ADMIN_I18N_FILE, COMMON_I18N_FILE]
-  # )
-  # description = generator.generate_feature_description(request=request)
-  # generator.write_feature_description_to_file(description, get_admin_output_path("Hostlocations"))
-
-  # feature_name = "Nachrichtenversand"
-  # request: FeatureWriteRequest = FeatureWriteRequest(
-  #   feature_root_dir=MESSAGES_ROOT,
-  #   feature_name=feature_name,
-  #   i18n_files=[ADMIN_I18N_FILE, COMMON_I18N_FILE]
-  # )
-  # description = generator.generate_feature_description(request=request)
-  # generator.write_feature_description_to_file(description, get_admin_output_path("Messages"))
-
+  admin_features_generator = AdminFeaturesGenerator(generator=generator)
+  admin_features_generator.generate()
   concat_feature_files(feature_collection="admin")
+
+  self_feature_request: FeatureWriteRequest = FeatureWriteRequest(
+      feature_root_dir=SELF_SERVICE_ROOT,
+      feature_name="Teilnehmer Self Service",
+      i18n_files=[SELF_I18N_FILE, COMMON_I18N_FILE]
+  )
+
+  landing_feature_request: FeatureWriteRequest = FeatureWriteRequest(
+      feature_root_dir=LANDING_ROOT,
+      feature_name="Feature Überblick",
+      i18n_files=[COMMON_I18N_FILE, LANDING_I18N_FILE]
+  )
+
+  generate_feature_description_for_request(generator, self_feature_request, "self_service")
+  generate_feature_description_for_request(generator, landing_feature_request, "landing")
+  
+
+def generate_feature_description_for_request(generator: FeatureDescriptionGenerator, request: FeatureWriteRequest, feature_collection_name: str) -> str:
+  
+  script_dir = os.path.dirname(os.path.abspath(__file__))
+  output_file_path = os.path.join(script_dir, f"output/{feature_collection_name}/{feature_collection_name}.md")
+
+  description = generator.generate_feature_description(request=request)
+  generator.write_feature_description_to_file(description, output_file_path)
+  concat_feature_files(feature_collection=feature_collection_name)
+
 
 def concat_feature_files(feature_collection: str):
   script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -79,9 +72,9 @@ def concat_feature_files(feature_collection: str):
     f.write(concatenated_content)
   print(f"Wrote concatenated feature descriptions to {concatenated_filepath}")
 
-def get_admin_output_path(feature_name: str) -> str:
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, f"output/admin/{feature_name}.md")
+# def get_admin_output_path(feature_name: str) -> str:
+#     script_dir = os.path.dirname(os.path.abspath(__file__))
+#     return os.path.join(script_dir, f"output/admin/{feature_name}.md")
 
 if __name__ == '__main__':
     main()

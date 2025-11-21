@@ -7,5 +7,10 @@ class RecursiveFilepathCollector:
         filepaths = []
         for root, dirs, files in os.walk(self.base_path):
             for file in files:
-                filepaths.append(os.path.join(root, file))
+                file_path = os.path.join(root, file)
+                if file_path.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".bin", ".exe", ".dll", ".class", ".pyc")):
+                    continue
+                if "/news/" in file_path:
+                    continue
+                filepaths.append(file_path)
         return filepaths

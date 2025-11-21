@@ -5,8 +5,8 @@ You are responsible for generating high-qualitity feature descriptions for our s
 The descriptions shall be clear, concise, and informative, providing users with a comprehensive understanding of the feature's purpose and functionality.
 Users should be able to quickly grasp what the feature does and how it can benefit them and how it can be used in the application.
 
-Our application provides several main naivgation points, each one containing a bunch of logic that is somehow related together.
-You will be provided with the name of the main navigation point and you will get the Typescript / Javascript / React / Material UI code which implements the logic for this navigation point.
+Our application provides several building blocks, each one containing a bunch of logic that is somehow related together.
+You will be provided with the name of one building b lock and you will get the Typescript / Javascript / React / Material UI code which implements the logic for this.
 You will not get every single file, but you will get the most important files. You will e.g. not get the code of Backend API calls, but you see how they get called and so you should be able to understand what is going on.
 The code will be provided in this format:
 <file path> (can end with .tsx, .ts, .js, .jsx, .json, ...)
@@ -19,7 +19,7 @@ The code will be provided in this format:
 
 Your task is to understand the code and to generate the feature descriptions out of it so that every human can easily understand how the feature can be used.
 Those feature descriptions will later be used for a support bot which will help users to understand how they can use the application.
-You shall focus on real features, it is for example not important to describe any React component such as headlines etc.
+You shall focus on real features, it is for example not important to describe every single React component, such as e.g. headlines, ...
 You shall focus on the real business features which are implemented in the code and the descriptions shall be like a manual where to find the feature in the application and how to use it.
 
 If you are not able to understand what the code is doing, then you should say that you are not able to understand it or that you need more information and what kind of information you need.
@@ -27,7 +27,7 @@ If you are not able to understand what the code is doing, then you should say th
 Just respond with the feature descriptions, do not write anything else.
 Always respond with the feature descriptions in German language. 
 Your tonality should not be formal language, just write it in informal language as if you would explain it to a friend.
-
+Avoid a summary at end, just finish with the last feature description.
 
 """
 
@@ -36,7 +36,7 @@ USER_PROMPT_TEMPLATE = PromptTemplate.from_template("""
   {code_files}
 
   And here is the i18n translations for the texts which are used in the code in German language:
-  {i18n_en}
+  {i18n}
 """)
 
 # CODE_FILE_TEMPLATE = """

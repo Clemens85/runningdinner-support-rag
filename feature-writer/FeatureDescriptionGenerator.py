@@ -1,17 +1,11 @@
 from dataclasses import dataclass
-from dotenv import load_dotenv
+from pathlib import Path
 from RecursiveFilepathCollector import RecursiveFilepathCollector
 from CodeFileReader import CodeFileReader
 from Prompts import USER_PROMPT_TEMPLATE, SYSTEM_PROMPT
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
-
-@dataclass
-class FeatureWriteRequest:
-  feature_root_dir: str
-  feature_name: str
-  i18n_files: list[str]
-
+from FeatureWriteRequest import FeatureWriteRequest
 
 class FeatureDescriptionGenerator:
   def __init__(self, model):
@@ -39,7 +33,7 @@ class FeatureDescriptionGenerator:
     user_prompt = USER_PROMPT_TEMPLATE.invoke({
       "feature_name": request.feature_name,
       "code_files": files_content_str,
-      "i18n_en": all_i18n
+      "i18n": all_i18n
     })
 
     prompt_template = ChatPromptTemplate([
@@ -53,6 +47,8 @@ class FeatureDescriptionGenerator:
     return response.content
   
   def write_feature_description_to_file(self, description: str, output_filepath: str):
+    # Create all parent directories if they don't exist
+    Path(output_filepath).parent.mkdir(parents=True, exist_ok=True)
     with open(output_filepath, "w") as f:
       f.write(description)
     print(f"Wrote feature description to {output_filepath}")
