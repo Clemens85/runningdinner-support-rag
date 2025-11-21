@@ -15,7 +15,8 @@ SELF_SERVICE_ROOT = f"{PROJECT_ROOT}/webapp/src/self"
 LANDING_I18N_FILE = f"{PROJECT_ROOT}/shared/src/i18n/translations/de/LandingMessages_lang_de.ts"
 LANDING_ROOT = f"{PROJECT_ROOT}/webapp/src/landing"
 
-OPENAI_MODEL = "gpt-4o-mini"
+#OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_MODEL = "gpt-4.1-mini"
 TEMPERATURE = 0.1
 
 load_dotenv(override=True)
@@ -37,7 +38,7 @@ def main():
 
   landing_feature_request: FeatureWriteRequest = FeatureWriteRequest(
       feature_root_dir=LANDING_ROOT,
-      feature_name="Feature Überblick",
+      feature_name="Startseite",
       i18n_files=[COMMON_I18N_FILE, LANDING_I18N_FILE]
   )
 
@@ -45,7 +46,7 @@ def main():
   generate_feature_description_for_request(generator, landing_feature_request, "landing")
   
 
-def generate_feature_description_for_request(generator: FeatureDescriptionGenerator, request: FeatureWriteRequest, feature_collection_name: str) -> str:
+def generate_feature_description_for_request(generator: FeatureDescriptionGenerator, request: FeatureWriteRequest, feature_collection_name: str):
   
   script_dir = os.path.dirname(os.path.abspath(__file__))
   output_file_path = os.path.join(script_dir, f"output/{feature_collection_name}/{feature_collection_name}.md")

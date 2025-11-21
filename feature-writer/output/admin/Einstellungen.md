@@ -1,0 +1,6 @@
+**Einstellungen**  
+In den Einstellungen kannst du alle wichtigen Basis- und öffentlichen Details deines Running Dinner Events verwalten. Du findest das Feature im Admin-Bereich unter „Einstellungen“. Dort kannst du den Event-Titel, Datum, Sichtbarkeit (z.B. öffentlich oder geschlossen), Anmeldetyp und weitere Basisdaten anpassen. Außerdem kannst du hier die öffentlichen Informationen bearbeiten, die Teilnehmer sehen, wie z.B. Beschreibung, Kontaktinfos und Anmeldeschluss.  
+
+Das Feature bietet dir auch die Möglichkeit, eine After-Party-Location zu hinterlegen oder zu entfernen, die dann in der Eventbeschreibung und den Dinner-Routen angezeigt wird. Du kannst die Registrierung für dein Event aktivieren oder deaktivieren und bei Änderungen, die Teilnehmer betreffen (z.B. Datum ändern), wirst du durch Hinweise und Dialoge unterstützt, damit du deine Teilnehmer rechtzeitig informieren kannst.  
+
+Praktisch: Du kannst dein Event hier auch endgültig absagen. Nach der Absage wirst du direkt zum Nachrichtenversand weitergeleitet, um alle Teilnehmer zu informieren. Änderungen speicherst du bequem über die jeweiligen Formulare mit einem Klick auf „Speichern“. So hast du alle wichtigen Einstellungen deines Events zentral an einem Ort und kannst flexibel reagieren.
